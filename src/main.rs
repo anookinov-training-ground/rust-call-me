@@ -79,6 +79,15 @@ fn main() {
     //         drop(self.z);
     //     }
     // }
+
+    let f: &dyn Fn() = &f;
+    quox_fnmut(f);
+
+    let f: &mut dyn FnMut() = &f;
+    quox_fnmut(f);
+
+    let f: Box<dyn FnOnce()> = Box::new(f);
+    quox_fnonce(f);
 }
 
 fn bar() {}
@@ -144,6 +153,27 @@ where
     F: FnOnce(),
 {
     (f)()
+}
+
+// Box<dyn Fn()> did not implement Fn()
+
+// impl FnOnce() for Box<dyn FnOnce()> {
+//     fn call(self) {
+//         let x: dyn FnOnce() = self.0;
+//         x.call()
+//     }
+// }
+
+fn hello(f: Box<dyn Fn()>) {
+    f()
+}
+
+fn hello_fnmut(mut f: Box<dyn FnMut()>) {
+    f()
+}
+
+fn hello_fnonce(mut f: Box<dyn FnOnce()>) {
+    f()
 }
 
 pub fn make_fn() -> impl Fn() {
