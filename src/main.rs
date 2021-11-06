@@ -1,3 +1,5 @@
+#![feature(const_trait_impl, const_fn_trait_bound)]
+
 fn main() {
     println!("Hello, world!");
     let x = bar; // function item
@@ -88,6 +90,26 @@ fn main() {
 
     let f: Box<dyn FnOnce()> = Box::new(f);
     quox_fnonce(f);
+
+    let x = || {
+        String::from("foo");
+    };
+    foo(x);
+}
+
+const fn test_foo() {
+    let x = || {
+        String::from("foo");
+    };
+    foo(x);
+}
+
+const fn make_zero() -> i32 {
+    0
+}
+
+const fn foo<F: ~const FnOnce()>(f: F) {
+    f()
 }
 
 fn bar() {}
