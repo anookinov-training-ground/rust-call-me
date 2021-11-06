@@ -8,6 +8,7 @@ fn main() {
     baz(bar_generic::<i32>);
     baz_u32(bar_baz::<u32>);
     baz_u32(bar_baz::<i32>);
+    quox(bar_generic::<u32>);
 }
 
 fn bar() {}
@@ -24,4 +25,52 @@ fn baz(f: fn()) {
 
 fn baz_u32(f: fn(u32) -> u32) {
     println!("{}", std::mem::size_of_val(&f));
+}
+
+impl<F> FnOnce() for F
+where
+    F: Fn(),
+{
+    fn call(&self) {
+        Fn::call(&self)
+    }
+}
+
+impl<F> FnOnce() for F
+where
+    F: FnMut(),
+{
+    fn call(mut self) {
+        FnMut::call(&mut self)
+    }
+}
+
+impl<F> FnMut() for F
+where
+    F: Fn(),
+{
+    fn call(&mut self) {
+        Fn::call(&*self)
+    }
+}
+
+fn quox<F>(f: &F)
+where
+    F: Fn(),
+{
+    (f)()
+}
+
+fn quox_fnmut<F>(f: &mut F)
+where
+    F: FnMut(),
+{
+    (f)()
+}
+
+fn quox_fnonce<F>(f: F)
+where
+    F: FnOnce(),
+{
+    (f)()
 }
