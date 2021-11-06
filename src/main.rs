@@ -1,5 +1,7 @@
 #![feature(const_trait_impl, const_fn_trait_bound)]
 
+use std::future::Future;
+
 fn main() {
     println!("Hello, world!");
     let x = bar; // function item
@@ -95,6 +97,19 @@ fn main() {
         String::from("foo");
     };
     foo(x);
+
+    // tokio::spawn(quox_lt(|x| x)); // + 'static
+    quox_lt(|x| x).await;
+}
+
+// async fn quox_lt<F>(f: F)
+fn quox_lt<F>(f: F) -> impl Future<Output = ()>
+where
+    F: for<'a> Fn(&'a str) -> &'a str,
+{
+    async move {
+        let _ = f;
+    }
 }
 
 const fn test_foo() {
